@@ -1,7 +1,6 @@
 ﻿using IFCTestWork.Models;
 using System.Collections.Generic;
 using System.Linq;
-using Xbim.Ifc2x3.PropertyResource;
 using Xbim.Ifc4.Interfaces;
 
 namespace IFCTestWork.ViewModels
@@ -54,7 +53,7 @@ namespace IFCTestWork.ViewModels
                         properties.Add(new TableItem()
                         {
                             Parameter = property.Name,
-                            Value = ((IfcPropertySingleValue)property).NominalValue.ToString()
+                            Value = ((IIfcPropertySingleValue)property).NominalValue.ToString()
                         });
                     }
                 }

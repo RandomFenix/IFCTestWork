@@ -26,7 +26,9 @@ namespace IFCTestWork.ViewModels
         public IfcStore model;
         public AsyncRelayCommand OpenCommand { get; set; }
 
-        public ObservableCollection<TableItem> Properties { get; set; } = new ObservableCollection<TableItem>(); 
+        public ObservableCollection<TableItem> Attributes { get; set; } = new ObservableCollection<TableItem>();
+        public ObservableCollection<TableItem> Properties { get; set; } = new ObservableCollection<TableItem>();
+        public ObservableCollection<TableItem> MaterialsIfc { get; set; } = new ObservableCollection<TableItem>();
         private Dictionary<int, List<GeometryModel3D>> GeometryModels = new Dictionary<int, List<GeometryModel3D>>();
         private Dictionary<GeometryModel3D, IIfcProduct> IfcProducts = new Dictionary<GeometryModel3D, IIfcProduct>();
         private Dictionary<GeometryModel3D, Material> Materials = new Dictionary<GeometryModel3D, Material>();

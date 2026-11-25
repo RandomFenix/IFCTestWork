@@ -39,7 +39,9 @@ namespace IFCTestWork
         }
         private void IfcTree_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
+            ViewModel.Attributes.Clear();
             ViewModel.Properties.Clear();
+            ViewModel.MaterialsIfc.Clear();
 
             if (DataContext is MainViewModel viewModel && e.NewValue is NodeItem selected)
             {
@@ -48,9 +50,19 @@ namespace IFCTestWork
 
             if (e.NewValue is NodeItem item && item.Entity is IIfcObject ifcObject)
             {
+                foreach (var attribute in PropertyViewModel.GetAttributes(ifcObject))
+                {
+                    ViewModel.Attributes.Add(attribute);
+                }
+
                 foreach (var property in PropertyViewModel.GetProperties(ViewModel, ifcObject))
                 {
                     ViewModel.Properties.Add(property);
+                }
+
+                foreach (var material in PropertyViewModel.GetMaterials(ifcObject))
+                {
+                    ViewModel.MaterialsIfc.Add(material);
                 }
             }
             else

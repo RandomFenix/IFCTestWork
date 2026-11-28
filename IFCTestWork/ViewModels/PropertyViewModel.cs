@@ -1,12 +1,68 @@
-﻿using IFCTestWork.Models;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using IFCTestWork.Models;
+using NLog;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Xbim.Ifc4.Interfaces;
 
 namespace IFCTestWork.ViewModels
 {
-    public class PropertyViewModel
+    public class PropertyViewModel : ObservableObject
     {
+        private static readonly Logger Log = LogManager.GetCurrentClassLogger();
+
+        private string _title;
+        public string Title { get => _title; private set => SetProperty(ref _title, value); }
+        public ObservableCollection<TableItem> Attributes { get; set; } = new ObservableCollection<TableItem>();
+        public ObservableCollection<TableItem> Properties { get; set; } = new ObservableCollection<TableItem>();
+        public ObservableCollection<TableItem> MaterialsIfc { get; set; } = new ObservableCollection<TableItem>();
+
+        public bool HasSelection => Title != null;
+
+        public void Show(MainViewModel mainViewModel, IIfcObjectDefinition obj)
+        {
+            if (obj == null)
+            {
+                Clear();
+                return;
+            }
+
+            try
+            {
+                Title = string.IsNullOrWhiteSpace(obj.Name) ? "(без имени)" : obj.Name.ToString();
+                foreach (var attribute in GetAttributes((IIfcObject)obj))
+                {
+                    Attributes.Add(attribute);
+                }
+                foreach (var property in GetProperties(mainViewModel, (IIfcObject)obj))
+                {
+                    Properties.Add(property);
+                }
+                foreach (var material in GetMaterials((IIfcObject)obj))
+                {
+                    MaterialsIfc.Add(material);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Warn(ex, "Не удалось прочитать свойства {Type} #{Label}",
+                         obj.ExpressType.ExpressName, obj.EntityLabel);
+                Clear();
+            }
+            OnPropertyChanged(nameof(HasSelection));
+        }
+
+        public void Clear()
+        {
+            Title = null;
+            Attributes = new ObservableCollection<TableItem>();
+            Properties = new ObservableCollection<TableItem>();
+            MaterialsIfc = new ObservableCollection<TableItem>();
+            OnPropertyChanged(nameof(HasSelection));
+        }
+
         public List<TableItem> GetAttributes(IIfcObject ifcObject)
         {
             List<TableItem> attributes = new List<TableItem>();

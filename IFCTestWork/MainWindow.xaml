@@ -10,9 +10,6 @@
         xmlns:helix="http://helix-toolkit.org/wpf"
         mc:Ignorable="d"
         Title="Просмотр IFC" Height="450" Width="1000">
-    <Window.DataContext>
-        <vm:MainViewModel/>
-    </Window.DataContext>
     <Border BorderBrush="Black" BorderThickness="5" CornerRadius="10">
         <DockPanel>
             <ToolBarTray DockPanel.Dock="Top" Background="#F3F3F3">
@@ -73,55 +70,16 @@
                     </helix:HelixViewport3D>
                 </Border>
 
-                    <GridSplitter Grid.Column="3"
+                <GridSplitter Grid.Column="3"
                                   Width="5"
                                   HorizontalAlignment="Center"
                                   VerticalAlignment="Stretch"
                                   ShowsPreview="True"/>
 
                 <Border Grid.Column="4" BorderBrush="#CCCCCC" BorderThickness="1" CornerRadius="3">
-                    <TabControl BorderThickness="0">
-                        <TabItem Header="Атрибуты">
-                            <DataGrid ItemsSource="{Binding Attributes}"
-                                      AutoGenerateColumns="False"
-                                      CanUserAddRows="False"
-                                      IsReadOnly="True"
-                                      GridLinesVisibility="Horizontal"
-                                      HeadersVisibility="Column">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Атрибут" Binding="{Binding Parameter}" Width="100"/>
-                                    <DataGridTextColumn Header="Значение" Binding="{Binding Value}" Width="*"/>
-                                </DataGrid.Columns>
-                            </DataGrid>
-                        </TabItem>
-                        <TabItem Header="Свойства">
-                            <DataGrid ItemsSource="{Binding Properties}"
-                                      AutoGenerateColumns="False"
-                                      CanUserAddRows="False"
-                                      IsReadOnly="True"
-                                      GridLinesVisibility="Horizontal"
-                                      HeadersVisibility="Column">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Атрибут" Binding="{Binding Parameter}" Width="100"/>
-                                    <DataGridTextColumn Header="Значение" Binding="{Binding Value}" Width="*"/>
-                                </DataGrid.Columns>
-                            </DataGrid>
-                        </TabItem>
-                        <TabItem Header="Материалы">
-                            <DataGrid ItemsSource="{Binding MaterialsIfc}"
-                                      AutoGenerateColumns="False"
-                                      CanUserAddRows="False"
-                                      IsReadOnly="True"
-                                      GridLinesVisibility="Horizontal"
-                                      HeadersVisibility="Column">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Слой" Binding="{Binding Parameter}" Width="100"/>
-                                    <DataGridTextColumn Header="Материал" Binding="{Binding Value}" Width="*"/>
-                                </DataGrid.Columns>
-                            </DataGrid>
-                        </TabItem>
-                    </TabControl>
+                    <local:PropertyView DataContext="{Binding PropertiesPanel}"/>
                 </Border>
+
             </Grid>
         </DockPanel>
     </Border>

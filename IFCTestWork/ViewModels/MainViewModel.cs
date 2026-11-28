@@ -22,13 +22,10 @@ namespace IFCTestWork.ViewModels
     public class MainViewModel : ObservableObject
     {
         private static readonly Logger Log = LogManager.GetCurrentClassLogger();
-
+        public PropertyViewModel PropertiesPanel { get; } = new PropertyViewModel();
         public IfcStore model;
         public AsyncRelayCommand OpenCommand { get; set; }
-
-        public ObservableCollection<TableItem> Attributes { get; set; } = new ObservableCollection<TableItem>();
-        public ObservableCollection<TableItem> Properties { get; set; } = new ObservableCollection<TableItem>();
-        public ObservableCollection<TableItem> MaterialsIfc { get; set; } = new ObservableCollection<TableItem>();
+        
         private Dictionary<int, List<GeometryModel3D>> GeometryModels = new Dictionary<int, List<GeometryModel3D>>();
         private Dictionary<GeometryModel3D, IIfcProduct> IfcProducts = new Dictionary<GeometryModel3D, IIfcProduct>();
         private Dictionary<GeometryModel3D, Material> Materials = new Dictionary<GeometryModel3D, Material>();
@@ -180,7 +177,7 @@ namespace IFCTestWork.ViewModels
                 }
                 else
                 {
-                    Nodes = new ObservableCollection<NodeItem> { AddNode(project, null) };
+                    Nodes = new ObservableCollection<NodeItem> { AddNode(project, null, NodesByLabel) };
                 }
 
                 ModelLoaded?.Invoke();
@@ -192,16 +189,18 @@ namespace IFCTestWork.ViewModels
 
             
         }
-        private NodeItem AddNode(IIfcObjectDefinition ifcObject, NodeItem parent)
+        private NodeItem AddNode(IIfcObjectDefinition ifcObject, NodeItem parent, Dictionary<int, NodeItem> map)
         {
             var node = new NodeItem(ifcObject, parent, OnNodeSelectionChanged);
-            NodesByLabel[ifcObject.EntityLabel] = node;
+            //NodesByLabel[ifcObject.EntityLabel] = node;
+
+            map[ifcObject.EntityLabel] = node;
 
             foreach (var rel in ifcObject.IsDecomposedBy)
             {
                 foreach (var child in rel.RelatedObjects)
                 {
-                    node.Children.Add(AddNode(child, parent));
+                    node.Children.Add(AddNode(child, node, map));
                 }  
             }    
 
@@ -211,7 +210,7 @@ namespace IFCTestWork.ViewModels
                 {
                     foreach (var element in relation.RelatedElements)
                     {
-                        node.Children.Add(AddNode(element, parent));
+                        node.Children.Add(AddNode(element, node, map));
                     }   
                 }    
             }
@@ -228,6 +227,7 @@ namespace IFCTestWork.ViewModels
                     .Where(GeometryModels.ContainsKey)
                     .SelectMany(g => GeometryModels[g]);
                 SetHighlight(meshes);
+                PropertiesPanel.Show(this, node.Entity);
             }
             else if (SelectedNode == node)
             {
@@ -238,8 +238,8 @@ namespace IFCTestWork.ViewModels
 
         public void SelectObject(GeometryModel3D selectObject)
         {
+            var test = IfcProducts.TryGetValue(selectObject, out var product);
             if (selectObject != null &&
-                IfcProducts.TryGetValue(selectObject, out var product) &&
                 NodesByLabel.TryGetValue(product.EntityLabel, out var node))
             {
                 node.IsSelected = true;
